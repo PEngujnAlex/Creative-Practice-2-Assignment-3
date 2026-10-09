@@ -34,42 +34,67 @@ public class quizController : MonoBehaviour
         QuizUI.SetActive(false);
         SlidingGameBoard.SetActive(false);
         SlidingGameManager.SetActive(false);
+
+        if (!TryGetPointerDownPosition(out Vector2 pointerPosition))
+        {
+            return;
+        }
+
+        Camera arCamera = Camera.main;
+        if (arCamera == null)
+        {
+            Debug.LogError("No MainCamera is available to select an AR topic.");
+            return;
+        }
+
+        Ray ray = arCamera.ScreenPointToRay(pointerPosition);
+        if (!Physics.Raycast(ray, out RaycastHit hit, 50f))
+        {
+            return;
+        }
+
+        if (hit.transform.CompareTag("ducky"))
+        {
+            GameMode = 2;
+        }
+        else if (hit.transform.CompareTag("notTrain"))
+        {
+            GameMode = 3;
+        }
     }
 
     void doQuiz()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); //Mouse.current.position
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit, 50))
-            {
-                if (hit.transform.tag == "ducky")
-                {
-                    TopicUI.SetActive(false);
-                    QuizUI.SetActive(true);
-                }
-            }
-        }
+        TopicUI.SetActive(false);
+        QuizUI.SetActive(true);
+        SlidingGameBoard.SetActive(false);
+        SlidingGameManager.SetActive(false);
     }
 
     void doSlidingGame()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); //Mouse.current.position
-            RaycastHit hit;
+        TopicUI.SetActive(false);
+        QuizUI.SetActive(false);
+        SlidingGameBoard.SetActive(true);
+        SlidingGameManager.SetActive(true);
+    }
 
-            if (Physics.Raycast(ray, out hit, 50))
-            {
-                if (hit.transform.tag == "notTrain")
-                {
-                    TopicUI.SetActive(false);
-                    SlidingGameBoard.SetActive(true); //this might work, this might not who knows
-                    SlidingGameManager.SetActive(true);
-                }
-            }
+    bool TryGetPointerDownPosition(out Vector2 position)
+    {
+        if (Touchscreen.current != null &&
+            Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        {
+            position = Touchscreen.current.primaryTouch.position.ReadValue();
+            return true;
         }
+
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            position = Mouse.current.position.ReadValue();
+            return true;
+        }
+
+        position = default;
+        return false;
     }
 }

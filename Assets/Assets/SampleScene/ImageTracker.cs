@@ -15,7 +15,7 @@ public class ImageTracker : MonoBehaviour
 
     List<GameObject> ARObjects = new List<GameObject>();
 
-    //public TMP_Text infoBox;
+    public TMP_Text infoBox;
 
     void Update()
     {
@@ -24,12 +24,12 @@ public class ImageTracker : MonoBehaviour
 
     void outputTracking()
     {
-        //infoBox.text = "Tracking Data: \n";
+        infoBox.text = "Tracking Data: \n";
 
         int i = 0;
         foreach (var trackedImage in trackedImages.trackables)
         {
-            //infoBox.text += "Image: " + trackedImage.referenceImage.name + " " + trackedImage.trackingState + "\n";
+            infoBox.text += "Image: " + trackedImage.referenceImage.name + " " + trackedImage.trackingState + "\n";
 
             if (trackedImage.trackingState == TrackingState.Limited)
             {
@@ -48,7 +48,7 @@ public class ImageTracker : MonoBehaviour
         trackedImages = GetComponent<ARTrackedImageManager>();
     }
 
-    void OnEnabled()
+    void OnEnable()
     {
         trackedImages.trackedImagesChanged += OnTrackedImagesChanged;
     }
